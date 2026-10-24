@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ctcovid"
+version = "0.1.0"
+description = "COVID-19 CT-Scan Classifier using Transfer Learning (MobileNetV3, PyTorch)"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+    { name = "COVID CT Classifier Contributors" }
+]
+keywords = ["deep-learning", "pytorch", "transfer-learning", "covid-19", "ct-scan", "mobilenetv3"]
+dependencies = [
+    "torch>=2.2.0",
+    "torchvision>=0.17.0",
+    "numpy>=1.24.0",
+    "Pillow>=9.5.0",
+    "scikit-learn>=1.2.0",
+    "matplotlib>=3.7.0",
+    "fastapi>=0.100.0",
+    "uvicorn>=0.20.0",
+    "python-multipart>=0.0.6",
+]
+
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "ruff>=0.1.0",
+]
+
+[project.scripts]
+ctcovid-predict = "ctcovid.predict:main"
+ctcovid-eval = "ctcovid.evaluate:main"
+ctcovid-train = "ctcovid.train:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
