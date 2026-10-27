@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AETHER·SCAN // Autonomous COVID-19 CT Neural Diagnostic Lab</title>
+  <meta name="description" content="Cinematic, deep-learning medical imaging intelligence. Experience real-time MobileNetV3 transfer-learning inference and Grad-CAM lesion localization on axial chest CT scans.">
+  
+  <!-- Modern Typography Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/static/style.css">
+  
+  <!-- Three.js for 3D Holographic Volumetric Visualizer -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body class="cinematic-theme">
+  <!-- Interactive Ambient Spotlight Cursor Glow -->
+  <div class="cursor-spotlight" id="cursorSpotlight"></div>
+  <div class="scanline-overlay"></div>
+  <div class="grain-overlay"></div>
+
+  <!-- Telemetry Top Bar -->
+  <header class="hud-top-bar">
+    <div class="hud-left">
+      <div class="hud-monogram">
+        <span class="monogram-icon">⬢</span>
+        <span class="monogram-code">AETHER·SCAN // LAB-07</span>
+      </div>
+      <div class="hud-divider"></div>
+      <div class="hud-pill live-pill">
+        <span class="beacon-dot"></span>
+        <span class="hud-text">NEURAL CORE ONLINE</span>
+      </div>
+    </div>
+
+    <div class="hud-center">
+      <div class="telemetry-item">
+        <span class="tel-label">BACKBONE</span>
+        <span class="tel-val">MOBILENET-V3-LARGE</span>
+      </div>
+      <div class="telemetry-item">
+        <span class="tel-label">PARAMS</span>
+        <span class="tel-val">4.21M [QUANTIZED]</span>
+      </div>
+      <div class="telemetry-item">
+        <span class="tel-label">VIDEO ACCURACY</span>
+        <span class="tel-val highlight-cyan">99.51% TEST</span>
+      </div>
+    </div>
+
+    <div class="hud-right">
+      <div class="protocol-badge">
+        <span class="protocol-icon">⚠️</span>
+        <span class="protocol-text">PROTOCOL: NON-CLINICAL RESEARCH ONLY</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       HERO SECTION: "SEE WHAT THE MODEL SEES"
+       ======================================================================== -->
+  <section class="hero-stage" id="heroStage">
+    <!-- 3D Three.js Volumetric Particle Canvas Background -->
+    <div class="webgl-canvas-container" id="canvasContainer"></div>
+
+    <div class="hero-content">
+      <div class="hero-tag">
+        <span class="tag-bracket">[</span>
+        <span class="tag-text">DEEP FEATURE EXTRACTION & GRAD-CAM EXPLAINABILITY</span>
+        <span class="tag-bracket">]</span>
+      </div>
+
+      <h1 class="hero-headline">
+        SEE WHAT<br>
+        <span class="gradient-text">THE MODEL SEES.</span>
+      </h1>
+
+      <p class="hero-deck">
+        A neural vision platform that isolates COVID-19 pulmonary infiltrates, ground-glass opacities, and consolidation patterns inside 2D axial chest CT slices with surgical attention localization.
+      </p>
+
+      <div class="hero-cta-group">
+        <a href="#labWorkspace" class="btn-hero" id="btnEnterLab">
+          <span class="btn-hero-glow"></span>
+          <span class="btn-hero-content">
+            <span class="btn-icon">⚡</span>
+            <span class="btn-text">ENTER THE LAB</span>
+            <span class="btn-reticle">⌖</span>
+          </span>
+        </a>
+        <a href="#specsTerminal" class="btn-hero-secondary">
+          <span>INSPECT ARCHITECTURE & RESULTS</span>
+          <span class="arrow-glyph">→</span>
+        </a>
+      </div>
+
+      <!-- Floating Scientific Annotations -->
+      <div class="hero-telemetry-cluster">
+        <div class="cluster-item">
+          <span class="ci-num">0.015</span>
+          <span class="ci-desc">TEST LOSS [CROSS-ENTROPY]</span>
+        </div>
+        <div class="cluster-divider"></div>
+        <div class="cluster-item">
+          <span class="ci-num">99.67%</span>
+          <span class="ci-desc">pCT SENSITIVITY [RECALL]</span>
+        </div>
+        <div class="cluster-divider"></div>
+        <div class="cluster-item">
+          <span class="ci-num">2 / 601</span>
+          <span class="ci-desc">FALSE NEGATIVES [TYPE II ERROR]</span>
+        </div>
+      </div>
+
+      <!-- Scroll Indicator (Inside hero-content, in normal flow to guarantee zero collision) -->
+      <a href="#labWorkspace" class="scroll-cue" id="scrollCue">
+        <span class="scroll-text">INITIALIZE LAB VIEWPORT</span>
+        <div class="scroll-line"><div class="scroll-blip"></div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       THE LAB WORKSPACE: IMMERSIVE FULL-SCREEN ANALYSIS EXPERIENCE
+       ======================================================================== -->
+  <section class="lab-workspace" id="labWorkspace">
+    <!-- Specimen Carousel / Sample Selector Bar -->
+    <div class="specimen-deck">
+      <div class="deck-title-area">
+        <span class="deck-badge">SAMPLE VAULT</span>
+        <h3 class="deck-title">SELECT SPECIMEN SLICE OR INGEST DICOM/PNG</h3>
+      </div>
+      <div class="specimen-cards">
+        <!-- SPECIMEN #0: PROMINENT UPLOAD CARD -->
+        <button type="button" class="specimen-card upload-specimen-card" id="btnVaultUpload">
+          <div class="specimen-index"><span class="upload-beacon"></span> LIVE PATIENT INPUT</div>
+          <div class="specimen-status dot-upload">⇪ UPLOAD YOUR CT SCAN</div>
+          <div class="specimen-label">Drop or select DICOM, PNG, or JPG</div>
+          <div class="specimen-indicator highlight-cyan">BROWSE / DROP CT ↗</div>
+        </button>
+
+        <button type="button" class="specimen-card" data-class="pCT" id="specimenPCT">
+          <div class="specimen-index">SPECIMEN #01</div>
+          <div class="specimen-status dot-pCT">COVID-19 POSITIVE</div>
+          <div class="specimen-label">Multifocal Subpleural GGO (pCT)</div>
+          <div class="specimen-indicator">LOAD SLICE ⌖</div>
+        </button>
+
+        <button type="button" class="specimen-card" data-class="nCT" id="specimenNCT">
+          <div class="specimen-index">SPECIMEN #02</div>
+          <div class="specimen-status dot-nCT">NORMAL CLEAR LUNG</div>
+          <div class="specimen-label">Intact Parenchyma & Airways (nCT)</div>
+          <div class="specimen-indicator">LOAD SLICE ⌖</div>
+        </button>
+
+        <button type="button" class="specimen-card" data-class="NiCT" id="specimenNiCT">
+          <div class="specimen-index">SPECIMEN #03</div>
+          <div class="specimen-status dot-NiCT">NON-INFORMATIVE</div>
+          <div class="specimen-label">Extrapulmonary Neck/Tissue (NiCT)</div>
+          <div class="specimen-indicator">LOAD SLICE ⌖</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Workspace Two-Column Stage -->
+    <div class="lab-grid">
+      <!-- LEFT COLUMN: CINEMATIC CT HOLO-VIEWER & INGESTION -->
+      <div class="stage-viewer-column">
+        <div class="holo-viewer" id="holoViewer">
+          <!-- Corner HUD Crosshairs -->
+          <span class="hud-corner top-left">+</span>
+          <span class="hud-corner top-right">+</span>
+          <span class="hud-corner bottom-left">+</span>
+          <span class="hud-corner bottom-right">+</span>
+
+          <!-- Animated Scan Sweep Line -->
+          <div class="scan-laser hidden" id="scanLaser"></div>
+
+          <!-- View Mode HUD Pill Floating Header -->
+          <div class="viewer-top-hud">
+            <div class="hud-file-meta">
+              <span class="rec-dot"></span>
+              <span class="active-filename" id="hudFilename">AWAITING_SLICE.RAW</span>
+            </div>
+            
+            <div class="viewer-header-controls">
+              <button type="button" class="btn-hud-upload" id="btnHeaderUpload" title="Browse and upload your CT slice">
+                <span class="upload-arrow">⇪</span>
+                <span>UPLOAD CT SCAN</span>
+              </button>
+
+              <div class="view-mode-selector" role="tablist">
+                <button type="button" class="view-btn active" data-view="dual" id="btnViewDual">DUAL FOCUS</button>
+                <button type="button" class="view-btn" data-view="overlay" id="btnViewOverlay">OVERLAY</button>
+                <button type="button" class="view-btn" data-view="heatmap" id="btnViewHeatmap">THERMAL</button>
+                <button type="button" class="view-btn" data-view="raw" id="btnViewRaw">RAW SLICE</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Holographic Drag-and-Drop Overlay (Active when user drags files over viewer) -->
+          <div class="drag-drop-overlay hidden" id="dragDropOverlay">
+            <div class="ddo-box">
+              <div class="ddo-icon">⇪</div>
+              <div class="ddo-title">RELEASE CT SCAN TO RUN INFERENCE</div>
+              <div class="ddo-sub">PNG / JPG / DICOM axial thoracic slice · Auto-tensorized to 224×224</div>
+            </div>
+          </div>
+
+          <!-- Display Stage Viewports -->
+          <div class="display-stage" id="displayStage">
+            <!-- Upload Dropzone (When Empty) -->
+            <div class="holo-dropzone" id="dropzone" tabindex="0">
+              <input type="file" id="fileInput" accept="image/jpeg,image/png,image/jpg" hidden>
+              <div class="dropzone-reticle">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+                  <circle cx="12" cy="12" r="10" stroke-dasharray="4 2"/>
+                  <line x1="12" y1="2" x2="12" y2="22"/>
+                  <line x1="2" y1="12" x2="22" y2="12"/>
+                  <circle cx="12" cy="12" r="3" fill="currentColor" fill-opacity="0.2"/>
+                </svg>
+              </div>
+              <h3 class="dropzone-headline">DROP AXIAL SLICE OR INITIATE UPLOAD</h3>
+              <p class="dropzone-sub">Compatible with 512×512 DICOM exports · Auto-resized to 224×224 tensor</p>
+              <div class="btn-browse-trigger">BROWSE LOCAL STORAGE</div>
+            </div>
+
+            <!-- Single Image Viewport (Overlay / Heatmap / Raw) -->
+            <div class="single-viewport hidden" id="singleViewport">
+              <img id="mainHoloImg" src="" alt="CT Visualization Viewport">
+              <div class="viewport-lens-grid"></div>
+            </div>
+
+            <!-- Dual Side-by-Side Focus (Cinematic Default) -->
+            <div class="dual-viewport hidden" id="dualViewport">
+              <div class="dual-pane">
+                <div class="pane-header">ORIGINAL CT SLICE [2D AXIAL]</div>
+                <div class="pane-img-box">
+                  <img id="dualRawImg" src="" alt="Raw CT Slice">
+                </div>
+              </div>
+              <div class="dual-divider">
+                <span class="divider-icon">⇄</span>
+              </div>
+              <div class="dual-pane">
+                <div class="pane-header">GRAD-CAM ATTENTION FOCUS [features[-1]]</div>
+                <div class="pane-img-box">
+                  <img id="dualCamImg" src="" alt="Grad-CAM Overlay">
+                </div>
+              </div>
+            </div>
+
+            <!-- Loading Hologram Overlay -->
+            <div class="inference-loader hidden" id="inferenceLoader">
+              <div class="scanner-circle"></div>
+              <div class="loader-text-group">
+                <span class="loader-title">RUNNING CONVOLUTIONAL FEATURE MAPS</span>
+                <span class="loader-sub">Layer: MobileNetV3.features[-1] · Backward Gradients · Activation Pooling</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Viewport HUD Telemetry -->
+          <div class="viewer-bottom-hud">
+            <div class="hud-coords">
+              <span>FOV: 224mm</span>
+              <span>GRID: 7×7 CH:960</span>
+              <span>WIN: LUNG [-600, 1500 HU]</span>
+            </div>
+            <div class="hud-actions">
+              <button type="button" class="hud-action-btn btn-action-upload" id="btnResetAll" title="Clear current specimen and upload a new CT scan">
+                <span class="hud-btn-icon">⇪</span>
+                <span>UPLOAD NEW SCAN</span> [ESC]
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating Minimalist Calibration & Opacity Controls -->
+        <div class="telemetry-bar">
+          <div class="tel-slider-box">
+            <div class="tel-slider-header">
+              <label for="uncertaintyThreshold">UNCERTAINTY SAFETY CUTOFF</label>
+              <span class="tel-slider-val" id="valThreshold">50%</span>
+            </div>
+            <input type="range" id="uncertaintyThreshold" min="0.33" max="0.95" step="0.05" value="0.50">
+            <span class="tel-slider-hint">Rejects ambiguous scans below this confidence into "Uncertain" triage status</span>
+          </div>
+
+          <div class="tel-slider-box">
+            <div class="tel-slider-header">
+              <label for="camAlpha">GRAD-CAM OVERLAY INTENSITY</label>
+              <span class="tel-slider-val" id="valAlpha">45%</span>
+            </div>
+            <input type="range" id="camAlpha" min="0.10" max="0.90" step="0.05" value="0.45">
+            <span class="tel-slider-hint">Modulates thermal overlay opacity against grayscale radiodensity</span>
+          </div>
+        </div>
+
+        <!-- Interactive Scanner Perturbation Simulator -->
+        <div class="perturbation-cockpit">
+          <div class="cockpit-header">
+            <div class="cockpit-title">
+              <span class="cockpit-icon">⚙</span>
+              <span>STRESS-TEST MATRIX // SCANNER ARTIFACT SIMULATOR</span>
+            </div>
+            <button type="button" class="btn-cockpit-reset" id="btnResetPerturbations">RESET ARTIFACTS</button>
+          </div>
+          <div class="cockpit-sliders">
+            <div class="cockpit-slider">
+              <label>PACS TELEMETRY COMPRESSION (JPEG): <span id="valJpeg" class="highlight-cyan">100% [PRISTINE]</span></label>
+              <input type="range" id="jpegSlider" min="15" max="100" step="5" value="100">
+            </div>
+            <div class="cockpit-slider">
+              <label>WINDOWING / RADIODENSITY (EXPOSURE): <span id="valBright" class="highlight-cyan">1.0× [NOMINAL]</span></label>
+              <input type="range" id="brightSlider" min="0.4" max="1.8" step="0.1" value="1.0">
+            </div>
+            <div class="cockpit-slider">
+              <label>PATIENT POSITIONING TILT (ROLL): <span id="valRot" class="highlight-cyan">0° [ALIGNED]</span></label>
+              <input type="range" id="rotSlider" min="-20" max="20" step="2" value="0">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: DIAGNOSTIC TELEMETRY & ATTENTION INTELLIGENCE -->
+      <div class="stage-telemetry-column">
+        <!-- Ready / Empty Idle State -->
+        <div class="telemetry-empty" id="telemetryEmpty">
+          <div class="holo-cube-wireframe"></div>
+          <h3 class="te-title">AWAITING AXIAL INPUT</h3>
+          <p class="te-desc">Select a preset specimen from the vault above or drop an axial CT slice into the holo-deck to begin convolutional inference.</p>
+        </div>
+
+        <!-- Live Intelligence Output Panel -->
+        <div class="telemetry-active hidden" id="telemetryActive">
+          <!-- Primary Diagnosis Banner -->
+          <div class="verdict-banner" id="verdictBanner">
+            <div class="verdict-header">
+              <span class="verdict-sub">[NEURAL VERDICT // STAGE 2 FINE-TUNED]</span>
+              <div class="verdict-tag" id="verdictTag">DIAGNOSING...</div>
+            </div>
+            <h2 class="verdict-title" id="verdictTitle">--</h2>
+            <p class="verdict-summary" id="verdictSummary">--</p>
+            
+            <div class="verdict-confidence-meter">
+              <div class="vcm-info">
+                <span class="vcm-label">TOP-1 CLASSIFICATION CONFIDENCE</span>
+                <span class="vcm-number" id="vcmNumber">--%</span>
+              </div>
+              <div class="vcm-track">
+                <div class="vcm-bar" id="vcmBar" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- Safety Protocol & False Negative Indicator -->
+            <div class="safety-telemetry" id="safetyTelemetry">
+              <div class="st-icon">🛡️</div>
+              <div class="st-body">
+                <span class="st-title">HEADLINE SAFETY AUDIT: TYPE II ERROR CHECK</span>
+                <p class="st-detail" id="stDetail">Monitoring missed COVID-19 risk. Video benchmark: 2 false negatives / 601 real cases (99.67% sensitivity).</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Neural Probability Distribution Matrix -->
+          <div class="matrix-card">
+            <div class="mc-header">
+              <span class="mc-title">3-CLASS POSTERIOR PROBABILITIES</span>
+              <span class="mc-badge">SOFTMAX NORMALIZED</span>
+            </div>
+
+            <div class="mc-rows">
+              <!-- COVID-19 Row -->
+              <div class="mc-row row-pct">
+                <div class="mc-row-info">
+                  <div class="mc-label-group">
+                    <span class="mc-code">pCT</span>
+                    <span class="mc-name">COVID-19 Positive</span>
+                  </div>
+                  <span class="mc-val" id="valPCT">0.0%</span>
+                </div>
+                <div class="mc-track">
+                  <div class="mc-fill fill-pct" id="barPCT" style="width: 0%"></div>
+                </div>
+                <span class="mc-hint">Ground-glass opacities / subpleural consolidations</span>
+              </div>
+
+              <!-- Normal Row -->
+              <div class="mc-row row-nct">
+                <div class="mc-row-info">
+                  <div class="mc-label-group">
+                    <span class="mc-code">nCT</span>
+                    <span class="mc-name">Normal Lung Clearance</span>
+                  </div>
+                  <span class="mc-val" id="valNCT">0.0%</span>
+                </div>
+                <div class="mc-track">
+                  <div class="mc-fill fill-nct" id="barNCT" style="width: 0%"></div>
+                </div>
+                <span class="mc-hint">Healthy parenchyma, clear airway trees</span>
+              </div>
+
+              <!-- Non-Informative Row -->
+              <div class="mc-row row-nict">
+                <div class="mc-row-info">
+                  <div class="mc-label-group">
+                    <span class="mc-code">NiCT</span>
+                    <span class="mc-name">Non-Informative Slice</span>
+                  </div>
+                  <span class="mc-val" id="valNiCT">0.0%</span>
+                </div>
+                <div class="mc-track">
+                  <div class="mc-fill fill-nict" id="barNiCT" style="width: 0%"></div>
+                </div>
+                <span class="mc-hint">Neck, cranial bone, or sub-diaphragm; no usable lungs</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grad-CAM Interpretation Report -->
+          <div class="explainability-card">
+            <div class="ec-header">
+              <span class="ec-badge">PATHOPHYSIOLOGY VERIFICATION</span>
+              <h4 class="ec-title">ATTENTION LOCALIZATION REPORT</h4>
+            </div>
+            <p class="ec-narrative" id="ecNarrative">
+              Target Class: <strong class="highlight-cyan" id="ecTargetClass">--</strong>. Convolutional gradients isolate characteristic peripheral lesion patterns in lung fields, confirming the network ignores CT borders, scanning beds, and metadata text.
+            </p>
+            <div class="ec-telemetry-grid">
+              <div class="ect-box">
+                <span class="ect-label">GRADIENT TARGET</span>
+                <span class="ect-val">features[-1] (960-ch)</span>
+              </div>
+              <div class="ect-box">
+                <span class="ect-label">RESOLUTION</span>
+                <span class="ect-val">7×7 Spatial Map</span>
+              </div>
+              <div class="ect-box">
+                <span class="ect-label">POOLING</span>
+                <span class="ect-val">Global Average Pooling</span>
+              </div>
+              <div class="ect-box">
+                <span class="ect-label">RECTIFICATION</span>
+                <span class="ect-val">Positive Influence (ReLU)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       RESEARCHER SPECIFICATIONS & RESULTS TERMINAL
+       ======================================================================== -->
+  <section class="specs-terminal" id="specsTerminal">
+    <div class="terminal-shell">
+      <div class="terminal-top">
+        <div class="terminal-dots">
+          <span class="tdot red"></span>
+          <span class="tdot yellow"></span>
+          <span class="tdot green"></span>
+        </div>
+        <span class="terminal-title">AETHER·SYSTEM // SCIENTIFIC REPRODUCTION & INTEGRATION MATRIX</span>
+        <span class="terminal-id">ID: COVID-MOBILENETV3-2026</span>
+      </div>
+
+      <div class="terminal-grid">
+        <div class="term-col">
+          <h4 class="term-col-title">MODEL SPECIFICATION</h4>
+          <ul class="term-list">
+            <li><span>Backbone:</span> <strong>MobileNetV3-Large</strong></li>
+            <li><span>Pretraining:</span> <strong>ImageNet-1K</strong></li>
+            <li><span>Swapped Head:</span> <strong>Linear(1280 → 3 classes)</strong></li>
+            <li><span>Loss Criterion:</span> <strong>CrossEntropyLoss [Class-Weighted]</strong></li>
+            <li><span>Fine-Tuning:</span> <strong>2-Stage [Frozen Head → Unfrozen Net]</strong></li>
+            <li><span>Learning Rates:</span> <strong>1e-3 (Head) · 1e-4 (Full Net)</strong></li>
+          </ul>
+        </div>
+
+        <div class="term-col">
+          <h4 class="term-col-title">TUTORIAL VIDEO BENCHMARKS</h4>
+          <ul class="term-list">
+            <li><span>Kaggle Dataset:</span> <strong>19,685 Slices (9979 nCT / 4001 pCT / 5705 NiCT)</strong></li>
+            <li><span>Test Accuracy:</span> <strong class="highlight-cyan">99.51% (2,941 / 2,956)</strong></li>
+            <li><span>Validation Acc:</span> <strong>99.40%</strong></li>
+            <li><span>pCT Sensitivity:</span> <strong>99.67% (599 / 601 detected)</strong></li>
+            <li><span>pCT False Negatives:</span> <strong class="highlight-lime">2 Slices (Min. Type II Error)</strong></li>
+            <li><span>nCT Specificity:</span> <strong>99.79%</strong></li>
+          </ul>
+        </div>
+
+        <div class="term-col">
+          <h4 class="term-col-title">METHODOLOGICAL AUDIT</h4>
+          <div class="term-leakage-box">
+            <span class="tlb-tag">DATA LEAKAGE ADVISORY</span>
+            <p>CT scans hold contiguous slices per patient. In image-wise splitting without patient IDs, slice memorization can elevate test scores from ~90% to 99.5%. True clinical deployment mandates patient-grouped cross-validation.</p>
+          </div>
+          <div class="term-links">
+            <a href="/health" target="_blank" class="term-link">System Health API [GET /health] ↗</a>
+            <a href="/api/info" target="_blank" class="term-link">Model Metadata [GET /api/info] ↗</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Persistent Cinematic Footer -->
+  <footer class="cinematic-footer">
+    <div class="footer-left">
+      <span class="fl-brand">AETHER·SCAN AI</span>
+      <span class="fl-desc">Autonomous COVID-19 Radiologic Vision Platform</span>
+    </div>
+    <div class="footer-center">
+      <span>RESEARCH AND EDUCATIONAL PROTOTYPE ONLY · NOT A MEDICAL DEVICE</span>
+    </div>
+    <div class="footer-right">
+      <span>REPRODUCIBILITY SEED: 42 · PYTORCH 2.14 · MIT LICENSED</span>
+    </div>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
