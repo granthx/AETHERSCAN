@@ -24,7 +24,7 @@ This repository is a production-grade, reproducible implementation of a **COVID-
 
 ---
 
-## 3. Results & Reproduction
+## 2. Results & Reproduction
 
 | Metric | Video Tutorial Benchmark (Real Kaggle Data) | Synthetic Smoke Test | Clinical Implication |
 |---|:---:|:---:|---|
@@ -42,7 +42,7 @@ This repository is a production-grade, reproducible implementation of a **COVID-
 
 ---
 
-## 4. Architecture & Pipeline
+## 3. Architecture & Pipeline
 
 ```
 Raw Slices ──► Stratified 70/15/15 Split (seed 42)
@@ -59,7 +59,7 @@ Raw Slices ──► Stratified 70/15/15 Split (seed 42)
 
 ---
 
-## 5. Key Features
+## 4. Key Features
 
 - **Transfer Learning (MobileNetV3-Large)**: Balances low parameter count (~4.2M params) with high feature extraction capacity.
 - **Two-Stage Fine-Tuning**: Feature extraction stage trains the swapped head, followed by gentle end-to-end fine-tuning.
@@ -72,7 +72,7 @@ Raw Slices ──► Stratified 70/15/15 Split (seed 42)
 
 ---
 
-## 7. Working with the Real Kaggle Dataset
+## 5. Working with the Real Kaggle Dataset
 
 1. Place your `kaggle.json` API token at `~/.kaggle/kaggle.json`.
 2. Run the automated acquisition script:
@@ -87,7 +87,7 @@ Raw Slices ──► Stratified 70/15/15 Split (seed 42)
 
 ---
 
-## 9. Ethics, Limitations & Licensing
+## 6. Ethics, Limitations & Licensing
 
 - **License**: MIT License. See [LICENSE](LICENSE).
 - **Dataset License**: Sourced from Kaggle (`azaemon/preprocessed-ct-scans-for-covid19`, derived from HUST-19/iCTCF). Slices are for educational and academic research.
