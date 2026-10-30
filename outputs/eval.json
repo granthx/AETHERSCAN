@@ -1,0 +1,54 @@
+{
+  "accuracy": 0.966474771418896,
+  "confusion_matrix": [
+    [
+      825,
+      20,
+      11
+    ],
+    [
+      36,
+      1434,
+      27
+    ],
+    [
+      4,
+      1,
+      595
+    ]
+  ],
+  "classes": [
+    "NiCT",
+    "nCT",
+    "pCT"
+  ],
+  "per_class": {
+    "NiCT": {
+      "sensitivity": 0.9637850467289719,
+      "specificity": 0.9809251311397235,
+      "precision": 0.953757225433526,
+      "npv": 0.9851532567049809,
+      "support": 856,
+      "false_negatives": 31,
+      "false_positives": 40
+    },
+    "nCT": {
+      "sensitivity": 0.9579158316633266,
+      "specificity": 0.9855769230769231,
+      "precision": 0.9855670103092784,
+      "npv": 0.9579439252336449,
+      "support": 1497,
+      "false_negatives": 63,
+      "false_positives": 21
+    },
+    "pCT": {
+      "sensitivity": 0.9916666666666667,
+      "specificity": 0.9838504037399065,
+      "precision": 0.9399684044233807,
+      "npv": 0.9978448275862069,
+      "support": 600,
+      "false_negatives": 5,
+      "false_positives": 38
+    }
+  }
+}
