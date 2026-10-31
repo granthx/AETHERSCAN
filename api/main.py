@@ -31,7 +31,7 @@ from ctcovid.explain import explain_image
 from ctcovid.predict import DISCLAIMER, predict_image
 
 app = FastAPI(
-    title="COVID-19 CT Scanner AI API",
+    title="AETHER·SCAN COVID-19 CT Scanner AI API",
     description="Transfer learning (MobileNetV3) classification of chest CT slices into nCT, pCT, and NiCT.",
     version=__version__,
 )
