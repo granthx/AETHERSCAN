@@ -4,50 +4,50 @@
 
 ---
 
-## 1. Reproduction Summary
+## 1. Performance Summary
 
-The objective of this pipeline is to reproduce and validate the **COVID-19 CT-Scan Classifier** demonstrated in the video tutorial using transfer learning with **MobileNetV3**.
+Evaluated on the held-out real Kaggle CT-Scan test dataset (19,685 slices total, 2,953 test slices):
 
-### Headline Comparison Table
+### Headline Performance Table
 
-| Metric | Video Benchmark (Kaggle Real Data) | This Pipeline Scaffold | Note |
-|---|---|---|---|
-| **Test Accuracy** | **99.51%** (2,941 / 2,956) | 99.51% (recorded benchmark) | Real Kaggle CT-Scan dataset (19,685 slices) |
-| **Validation Accuracy** | ≈ 99.40% | 99.40% (recorded benchmark) | Held-out stratified validation split |
-| **Train Accuracy** | ≈ 98.60% | 98.60% (recorded benchmark) | Feature extraction + fine-tuning |
-| **Test Loss** | ≈ 0.015 | 0.0152 | CrossEntropyLoss with AdamW |
-| **Headline Safety Metric** | **pCT False Negatives = 2** | pCT False Negatives = 2 | Only 2 COVID slices missed out of 601 test slices |
-| **Synthetic Smoke Test** | N/A | Completed end-to-end | Validates pipeline offline (177 cartoon slices) |
-
-> **Local Training Notice:** In accordance with the user's explicit directive (*"do not train anything here"*), heavy GPU/CPU multi-epoch training jobs were not executed in this environment. All evaluation pipelines, CLI prediction, Grad-CAM, and web surfaces utilize the calibrated reference architecture initialized with the ground-truth video benchmark parameters (`outputs/metrics.json`).
+| Metric | Value | Detail / Clinical Significance |
+|---|:---:|---|
+| **Test Accuracy** | **96.65%** | 2,854 / 2,953 slices correctly categorized |
+| **Validation Accuracy** | **96.78%** | Best validation epoch reached **97.66%** |
+| **Train Accuracy** | **95.72%** | 10 epochs fine-tuning with inverse-frequency class weights |
+| **Test Loss** | **0.0799** | CrossEntropyLoss with AdamW & AMP |
+| **Headline Safety Metric** | **pCT FN = 5** | Only 5 COVID cases missed out of 600 test slices |
+| **pCT Sensitivity (Recall)** | **99.17%** | 595 out of 600 COVID cases detected |
+| **pCT Precision (PPV)** | **94.00%** | Certainty when positive diagnosis is made |
+| **pCT NPV** | **99.78%** | 998 out of 1000 negative diagnoses are true negatives |
+| **nCT Specificity** | **98.56%** | Healthy controls accurately cleared |
+| **NiCT Sensitivity** | **96.38%** | Non-diagnostic/non-lung slices correctly filtered |
 
 ---
 
 ## 2. Test Set Confusion Matrix & Per-Class Metrics
 
-Evaluated on the held-out test split of **2,956 slices** (601 `pCT`, 1,498 `nCT`, 857 `NiCT`):
+Evaluated on the held-out real test split of **2,953 slices** (`pCT`: 600, `nCT`: 1,497, `NiCT`: 856):
 
 ### Confusion Matrix
-
 | Actual \ Predicted | `NiCT` (Non-Informative) | `nCT` (Normal) | `pCT` (COVID-19 Positive) | Total Actual |
 |---|:---:|:---:|:---:|:---:|
-| **`NiCT`** | **855** | 1 | 1 | 857 |
-| **`nCT`** | 1 | **1,495** | 2 | 1,498 |
-| **`pCT`** | 0 | 2 | **599** | 601 |
-| **Total Predicted** | 856 | 1,498 | 602 | **2,956** |
+| **`NiCT`** | **825** | 20 | 11 | 856 |
+| **`nCT`** | 36 | **1,434** | 27 | 1,497 |
+| **`pCT`** | 4 | 1 | **595** | 600 |
+| **Total Predicted** | 865 | 1,455 | 633 | **2,953** |
 
 ### Per-Class Diagnostic Performance
-
 | Class | Sensitivity (Recall) | Specificity | Precision (PPV) | NPV | Support | False Negatives (FN) | False Positives (FP) |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **`pCT` (COVID-19)** | **99.67%** | 99.87% | 99.50% | 99.91% | 601 | **2** (Critical Safety Metric) | 3 |
-| **`nCT` (Normal)** | 99.80% | 99.79% | 99.80% | 99.79% | 1,498 | 3 | 3 |
-| **`NiCT` (Non-Info)** | 99.77% | 99.95% | 99.88% | 99.90% | 857 | 2 | 1 |
+| **`pCT` (COVID-19)** | **99.17%** | 98.39% | 94.00% | 99.78% | 600 | **5** (Safety Metric) | 38 |
+| **`nCT` (Normal)** | 95.79% | 98.56% | 98.56% | 95.79% | 1,497 | 63 | 21 |
+| **`NiCT` (Non-Info)** | 96.38% | 98.09% | 95.38% | 98.52% | 856 | 31 | 40 |
 
 ### Headline Safety Analysis: Type II Error (pCT False Negatives)
 - In disease screening, **False Negatives (Type II error)** represent the most catastrophic failure mode: a patient actively infected with COVID-19 is cleared as healthy or non-informative, leading to delayed medical care and uncontained transmission.
-- Out of 601 real COVID slices in the test set, the model missed only **2 slices** (Sensitivity: **99.67%**).
-- Both missed slices showed subtle peripheral ground-glass opacities that bordered the chest wall.
+- Out of 600 real COVID slices in the test set, the model missed only **5 slices** (Sensitivity: **99.17%**).
+- The remaining 595 COVID cases were correctly identified.
 
 ---
 
