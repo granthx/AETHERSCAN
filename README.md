@@ -19,22 +19,25 @@ This repository is a production-grade, reproducible implementation of a **COVID-
   - **`nCT`**: Normal CT (no findings).
   - **`pCT`**: COVID-19 positive (ground-glass opacities / consolidation).
   - **`NiCT`**: Non-informative slice (cuts outside lung parenchyma, e.g., neck or abdomen).
-- **Target Video Quality:** **99.51% test accuracy** on the Kaggle CT-Scan dataset.
+- **Model Performance:** **96.65% test accuracy** with **99.17% COVID sensitivity** on the Kaggle CT-Scan dataset.
 - **Headline Safety Metric:** Minimizing **Type II Error (`pCT` false negatives = missed COVID cases)**.
 
 ---
 
-## 2. Results & Reproduction
+## 2. Results & Evaluation
 
-| Metric | Video Tutorial Benchmark (Real Kaggle Data) | Synthetic Smoke Test | Clinical Implication |
+| Metric | Real Kaggle Dataset Evaluation (2,953 Slices) | Synthetic Smoke Test | Clinical Implication |
 |---|:---:|:---:|---|
-| **Test Accuracy** | **99.51%** (2,941 / 2,956) | 100.0% | Slices correctly categorized |
-| **Validation Accuracy** | **99.40%** | 100.0% | Held-out validation split |
-| **Train Accuracy** | **98.60%** | 99.1% | Feature extraction + fine-tuning |
-| **Test Loss** | **0.0152** | 0.0210 | CrossEntropyLoss with AdamW |
-| **pCT Sensitivity (Recall)** | **99.67%** (599 / 601) | 100.0% | Real COVID cases detected |
-| **pCT False Negatives** | **2 slices** | **0 slices** | **Headline Safety Metric (Missed COVID)** |
-| **nCT Specificity** | **99.79%** | 100.0% | Healthy controls cleared |
+| **Test Accuracy** | **96.65%** (2,854 / 2,953) | 100.0% | Slices correctly categorized |
+| **Validation Accuracy** | **96.78%** (Best: 97.66%) | 100.0% | Held-out validation split |
+| **Train Accuracy** | **95.72%** (10 epochs) | 99.1% | Two-stage fine-tuning with class weights |
+| **Test Loss** | **0.0799** | 0.0210 | CrossEntropyLoss with AdamW & AMP |
+| **pCT Sensitivity (Recall)** | **99.17%** (595 / 600) | 100.0% | Real COVID cases detected |
+| **pCT False Negatives** | **5 slices** | **0 slices** | **Headline Safety Metric (Missed COVID)** |
+| **pCT Precision (PPV)** | **94.00%** | 100.0% | Positive predictive value |
+| **pCT NPV** | **99.78%** | 100.0% | Negative predictive value (clear healthy with confidence) |
+| **nCT Specificity** | **98.56%** | 100.0% | Healthy controls cleared |
+| **NiCT Sensitivity** | **96.38%** | 100.0% | Non-informative slices filtered |
 
 *Full evaluation metrics, confusion matrix, and calibration curves are detailed in [docs/RESULTS.md](docs/RESULTS.md).*
 
