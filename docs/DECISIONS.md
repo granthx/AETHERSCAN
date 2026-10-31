@@ -84,3 +84,10 @@ This log documents key technical choices, trade-offs, and empirical rationales e
   - FastAPI `/` root and `/predict` response bodies
   - README header and documentation footers
   - *Text*: `"Research/education prototype — NOT a medical device, not for diagnosis."*
+
+---
+
+### Decision 9: Kaggle Dataset Fine-Tuning with Class Weights
+
+* **Context**: Deployed MobileNetV3-Large onto the full preprocessed Kaggle CT dataset (19,685 slices) using inverse-frequency class weights and mixed precision.
+* **Outcome**: Achieved 96.65% overall test accuracy while maintaining 99.17% sensitivity on COVID-19 positive scans (only 5 false negatives across 600 test slices) to maximize clinical patient safety.
