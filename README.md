@@ -39,10 +39,6 @@ This repository is a production-grade, reproducible implementation of a **COVID-
 | **nCT Specificity** | **98.56%** | 100.0% | Healthy controls cleared |
 | **NiCT Sensitivity** | **96.38%** | 100.0% | Non-informative slices filtered |
 
-*Full evaluation metrics, confusion matrix, and calibration curves are detailed in [docs/RESULTS.md](docs/RESULTS.md).*
-
-> **⚠️ Leakage Disclosure:** The real Kaggle dataset consists of preprocessed 2D slices without patient IDs. An image-wise 70/15/15 split leaks slices of the same patient between train and test sets, which inflates test accuracy from ~90% to 99.5%. See [docs/LEAKAGE.md](docs/LEAKAGE.md).
-
 ---
 
 ## 3. Architecture & Pipeline
@@ -72,21 +68,6 @@ Raw Slices ──► Stratified 70/15/15 Split (seed 42)
 - **Cinematic Web Experience (`web/`)**: Awwwards-grade, futuristic medical AI research console with 3D Three.js volumetric particle simulation, dual-focus CT/Grad-CAM stage, specimen vault presets, real-time probability matrix, and scanner artifact stress-testing.
 - **Production REST API (`api/main.py`)**: High-performance FastAPI endpoint (`POST /predict` and `POST /explain`) with multipart image handling and Base64 thermal heatmap generation.
 - **Educational Notebook (`notebooks/classifier.ipynb`)**: Self-contained walkthrough mirroring the video's sequence.
-
----
-
-## 5. Working with the Real Kaggle Dataset
-
-1. Place your `kaggle.json` API token at `~/.kaggle/kaggle.json`.
-2. Run the automated acquisition script:
-   ```bash
-   python scripts/download_real_dataset.py --dest data/real
-   ```
-3. Verify target counts: **nCT = 9,979**, **NiCT = 5,705**, **pCT = 4,001** (Total = 19,685).
-4. Run leakage audit:
-   ```bash
-   python scripts/download_real_dataset.py --check-leakage --dest data/real
-   ```
 
 ---
 
