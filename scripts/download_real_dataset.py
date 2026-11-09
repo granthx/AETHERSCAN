@@ -1,4 +1,4 @@
-"""Automated download, preparation, and leakage audit for the Kaggle COVID CT dataset.
+"""Automated download, preparation, and count verification for the Kaggle COVID CT dataset.
 
 Dataset: 'CT Scans for COVID-19 Classification'
 Kaggle Slug: azaemon/preprocessed-ct-scans-for-covid19
@@ -7,7 +7,6 @@ Target Counts: nCT = 9,979 · NiCT = 5,705 · pCT = 4,001 (Total = 19,685)
 from __future__ import annotations
 
 import argparse
-import re
 import shutil
 import sys
 from pathlib import Path
@@ -21,7 +20,7 @@ DEFAULT_SLUG = "azaemon/preprocessed-ct-scans-for-covid19"
 
 
 def verify_directory_counts(data_root: Path) -> dict:
-    """Verify file counts per class folder against the tutorial video's numbers."""
+    """Verify file counts per class folder against expected target numbers."""
     counts = {}
     mismatches = {}
     for cls_name, expected in TARGET_COUNTS.items():
@@ -46,49 +45,6 @@ def verify_directory_counts(data_root: Path) -> dict:
         "mismatches": mismatches,
         "is_exact_match": len(mismatches) == 0,
     }
-
-
-def analyze_patient_leakage(data_root: Path) -> dict:
-    """Check filename patterns to identify patient ID groupings and leakage risk.
-
-    Many chest CT datasets contain multiple 2D axial slices from the same 3D scan/patient.
-    If slices from Patient A appear in both Train and Test splits, image-level
-    stratification leaks patient anatomical features, artificially boosting accuracy.
-    """
-    patterns = [
-        re.compile(r"^(?:patient[_-]?)?([a-zA-Z0-9]+)[_-]slice[_-]?\d+", re.IGNORECASE),
-        re.compile(r"^([a-zA-Z0-9]+)[_-]\d+\.(?:png|jpg|jpeg)$", re.IGNORECASE),
-        re.compile(r"^([a-zA-Z]+[0-9]+)[_-]", re.IGNORECASE),
-        re.compile(r"^(rec[0-9]+)[_-]", re.IGNORECASE),
-    ]
-
-    patient_stats = {}
-    for cls_name in ["nCT", "pCT", "NiCT"]:
-        cls_dir = data_root / cls_name
-        if not cls_dir.exists():
-            continue
-
-        files = [f.name for f in cls_dir.iterdir() if f.is_file()]
-        patients = set()
-        matched_count = 0
-
-        for fname in files:
-            for pat in patterns:
-                m = pat.match(fname)
-                if m:
-                    pid = m.group(1)
-                    patients.add(pid)
-                    matched_count += 1
-                    break
-
-        patient_stats[cls_name] = {
-            "total_images": len(files),
-            "matched_with_patient_id": matched_count,
-            "unique_patients_inferred": len(patients),
-            "avg_slices_per_patient": round(matched_count / max(len(patients), 1), 1) if patients else 0,
-        }
-
-    return patient_stats
 
 
 def download_dataset(slug: str, dest_dir: Path) -> None:
@@ -126,7 +82,6 @@ def main(argv=None):
     p.add_argument("--slug", default=DEFAULT_SLUG, help="Kaggle dataset slug")
     p.add_argument("--dest", default="data/real", help="Destination directory")
     p.add_argument("--check-counts-only", action="store_true", help="Only verify counts without downloading")
-    p.add_argument("--check-leakage", action="store_true", help="Analyze patient ID patterns and slice leakage")
     p.add_argument("--dry-run", action="store_true", help="Dry run without downloading")
     a = p.parse_args(argv)
 
@@ -145,12 +100,6 @@ def main(argv=None):
                 print(f"  - {cls}: {msg}")
         else:
             print("\nExact match with video dataset!")
-        return
-
-    if a.check_leakage:
-        stats = analyze_patient_leakage(dest_dir)
-        print("\nPatient-Level Leakage Assessment:")
-        print(stats)
         return
 
     if a.dry_run:

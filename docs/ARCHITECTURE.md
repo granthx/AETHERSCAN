@@ -74,7 +74,7 @@ covid-ct-classifier/
 ├── notebooks/
 │   └── classifier.ipynb    # Walkthrough Jupyter notebook mirroring tutorial video
 ├── scripts/
-│   ├── download_real_dataset.py  # Automated Kaggle downloader & leakage auditor
+│   ├── download_real_dataset.py  # Automated Kaggle downloader and dataset verifier
 │   ├── make_synthetic_dataset.py # Synthetic cartoon stand-in dataset generator
 │   └── init_model_checkpoint.py  # Checkpoint & benchmark curve initializer
 ├── outputs/
@@ -85,8 +85,7 @@ covid-ct-classifier/
 ├── docs/
 │   ├── ARCHITECTURE.md     # This architectural document and Mermaid diagrams
 │   ├── DECISIONS.md        # Technical choices, trade-offs, and compliance notes
-│   ├── RESULTS.md          # Comprehensive results table and benchmark metrics
-│   └── LEAKAGE.md          # Patient-level vs slice-level leakage analysis
+│   └── RESULTS.md          # Comprehensive results table and benchmark metrics
 ├── tests/
 │   └── test_pipeline.py    # Pytest test suite (9 unit and integration tests)
 ├── .github/workflows/

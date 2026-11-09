@@ -1816,7 +1816,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   font-weight: 500;
 }
 
-.term-leakage-box {
+.term-notice-box {
   background: rgba(255, 42, 95, 0.05);
   border: 1px solid rgba(255, 42, 95, 0.25);
   border-radius: 4px;
@@ -1834,7 +1834,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   margin-bottom: 4px;
 }
 
-.term-leakage-box p {
+.term-notice-box p {
   font-size: 0.75rem;
   color: #cbd5e1;
   line-height: 1.45;

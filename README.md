@@ -39,6 +39,8 @@ This repository is a production-grade, reproducible implementation of a **COVID-
 | **nCT Specificity** | **98.56%** | 100.0% | Healthy controls cleared |
 | **NiCT Sensitivity** | **96.38%** | 100.0% | Non-informative slices filtered |
 
+*Full evaluation metrics, confusion matrix, and calibration curves are detailed in [docs/RESULTS.md](docs/RESULTS.md).*
+
 ---
 
 ## 3. Architecture & Pipeline
@@ -71,7 +73,7 @@ Raw Slices ──► Stratified 70/15/15 Split (seed 42)
 
 ---
 
-## 6. Ethics, Limitations & Licensing
+## 5. Ethics, Limitations & Licensing
 
 - **License**: MIT License. See [LICENSE](LICENSE).
 - **Dataset License**: Sourced from Kaggle (`azaemon/preprocessed-ct-scans-for-covid19`, derived from HUST-19/iCTCF). Slices are for educational and academic research.
